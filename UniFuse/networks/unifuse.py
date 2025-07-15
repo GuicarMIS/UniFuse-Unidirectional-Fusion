@@ -95,6 +95,9 @@ class UniFuse(nn.Module):
 
     def forward(self, input_equi_image, input_cube_image):
 
+        #print("Equi image shape:", input_equi_image.shape)
+        #print("Cube image shape:", input_cube_image.shape)
+
         # euqi image encoding
 
         if self.num_layers < 18:
@@ -114,6 +117,8 @@ class UniFuse(nn.Module):
 
         # cube image encoding
         cube_inputs = torch.cat(torch.split(input_cube_image, self.cube_h, dim=-1), dim=0)
+
+        #print("Cube inputs shape:", cube_inputs.shape)
 
         if self.num_layers < 18:
             cube_enc_feat0, cube_enc_feat1, cube_enc_feat2, cube_enc_feat3, cube_enc_feat4 \
@@ -136,9 +141,13 @@ class UniFuse(nn.Module):
         outputs = {}
 
         cube_enc_feat4 = torch.cat(torch.split(cube_enc_feat4, input_equi_image.shape[0], dim=0), dim=-1)
+        #print("Cube feature innermost shape:", cube_enc_feat4.shape)
         c2e_enc_feat4 = self.c2e["5"](cube_enc_feat4)
+        #print("C2E innermost shape:", c2e_enc_feat4.shape)
+        #print("Equi feature innermost shape:", cube_enc_feat4.shape)
         fused_feat4 = self.equi_dec_convs["fusion_5"](equi_enc_feat4, c2e_enc_feat4)
         equi_x = upsample(self.equi_dec_convs["upconv_5"](fused_feat4))
+        #print(equi_x.shape)
 
         cube_enc_feat3 = torch.cat(torch.split(cube_enc_feat3, input_equi_image.shape[0], dim=0), dim=-1)
         c2e_enc_feat3 = self.c2e["4"](cube_enc_feat3)

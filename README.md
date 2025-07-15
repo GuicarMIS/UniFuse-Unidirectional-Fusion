@@ -1,93 +1,55 @@
+# Setting Up the Repository
 
+To run this repository, follow these steps:
 
-# UniFuse (RAL+ICRA2021)
+## 1. Install Python and pip (on Ubuntu)
 
-Office source code of paper **UniFuse: Unidirectional Fusion for 360$^\circ$ Panorama Depth Estimation**, [arXiv](https://arxiv.org/abs/2102.03550), [Demo](https://youtu.be/9vm9OMksvrc)
-
-
-
-# Preparation
-
-#### Installation
-
-Environments
-
-
-* python 3.6
-* Pytorch >= 1.0.0
-* CUDA >= 9.0
-
-
-Install requirements
+First, make sure Python and pip are installed on your system. Open a terminal in the project's root folder and run the following commands:
 
 ```bash
-pip install -r requirements.txt
+sudo apt update
+sudo apt install python3 python3-pip
 ```
 
-#### Datasets 
+I have only tested the repository with Python 3.8.10 and Ubuntu 22.04. It is possible newer versions could lead to package conflicts. If that is the case, try installing specifically:
 
-Please download the preferred datasets,  i.e., [Matterport3D](https://niessner.github.io/Matterport/), [Stanford2D3D](http://3dsemantics.stanford.edu/), [3D60](https://vcl3d.github.io/3D60/) and [PanoSUNCG](https://fuenwang.ml/project/360-depth/). For Matterport3D, please preprocess it following [M3D-README.md](UniFuse/Matterport3D/README.md).
-
-
-
-# Training 
-
-#### UniFuse on Matterport3D
-
-```
-python train.py --data_path $DATA_PATH \
--dataset matterport3d \
---model_name Matterport3D_UniFuse \
---batch_size 6 \
---num_epochs 100 \
---height 512 \
---width 1024 \
---imagenet_pretrained \
---net UniFuse 
+```bash
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt-get update
+sudo apt-get install python3.8
 ```
 
-#### Equirectangular baseline on Matterport3D
+In the case you opt for the latter, replace ``python3`` with ``python3.8`` in the following commands.
 
+In case there are torch issues:
 ```
-python train.py --data_path $DATA_PATH \
--dataset matterport3d \
---model_name Matterport3D_Equi \
---batch_size 6 \
---num_epochs 100 \
---height 512 \
---width 1024 \
---imagenet_pretrained \
---net Equi 
+pip3 install torch==1.13 torchaudio==0.13 torchvision==0.14
 ```
 
-It is similar for other datasets. 
-
-
-# Evaluation  
-
-#### Pre-trained models
-
-The pre-trained models of UniFuse for 4 datasets are available, [Matterport3D](https://drive.google.com/drive/folders/1Dx7QR4ypujgLbyOo1zu4vIYXbqf95ToE?usp=sharing), [Stanford2D3D](https://drive.google.com/drive/folders/1q3LP9tyWi18yJwmhdjVn7dGUOsU3AH9G?usp=sharing), [3D60](https://drive.google.com/drive/folders/1B79FX_LoJ6GrcqyP1PIh2jqsiYs30V6P?usp=sharing) and [PanoSUNCG](https://drive.google.com/drive/folders/1trwQ7orixAjxWVK8rFLAtaaAqIjRB6va?usp=sharing).
-
-#### Test on a pre-trained model
+## 2. Set up and activate virtual environment
 
 ```
-python evaluate.py  --data_path $DATA_PATH --dataset matterport3d --load_weights_folder $MODEL_PATH 
+sudo apt install python3.8-venv
+python3 -m venv env
+source env/bin/activate
 ```
 
-
-
-## Citation
-
-Please cite our paper if you find our work useful in your research.
+## 3. Update pip
 
 ```
-@article{jiang2021unifuse,
-      title={UniFuse: Unidirectional Fusion for 360$^{\circ}$ Panorama Depth Estimation}, 
-      author={Hualie Jiang and Zhe Sheng and Siyu Zhu and Zilong Dong and Rui Huang},
-	  journal={IEEE Robotics and Automation Letters},
-	  year={2021},
-	  publisher={IEEE}
-}
+pip install --upgrade pip
 ```
+
+## 4. Install requirements
+
+```
+pip install -r UniFuse/requirements.txt
+```
+
+## 5. Run the code
+```
+cd UniFuse/
+python3 inference.py --data_path path/to/data/ --save_samples --output_path path/to/results/
+```
+
 

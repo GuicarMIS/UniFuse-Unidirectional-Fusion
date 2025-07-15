@@ -28,7 +28,7 @@ class Matterport3D(data.Dataset):
         """
         Args:
             root_dir (string): Directory of the Stanford2D3D Dataset.
-            list_file (string): Path to the txt file contain the list of image and depth files.
+             (string): Path to the txt file contain the list of image and depth files.
             height, width: input size.
             disable_color_augmentation, disable_LR_filp_augmentation,
             disable_yaw_rotation_augmentation: augmentation options.
@@ -119,7 +119,6 @@ class Matterport3D(data.Dataset):
 
         inputs["cube_rgb"] = cube_rgb
         inputs["normalized_cube_rgb"] = self.normalize(cube_aug_rgb)
-
 
         inputs["gt_depth"] = torch.from_numpy(np.expand_dims(gt_depth, axis=0))
         inputs["val_mask"] = ((inputs["gt_depth"] > 0) & (inputs["gt_depth"] <= self.max_depth_meters)

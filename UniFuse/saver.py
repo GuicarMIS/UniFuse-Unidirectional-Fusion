@@ -56,13 +56,19 @@ class Saver(object):
         pcd.colors = o3d.utility.Vector3dVector(RGB)
         o3d.io.write_point_cloud(path, pcd)
 
-    def save_samples(self, rgbs, gt_depths, pred_depths, depth_masks=None):
+    def save_samples(self, rgbs, gt_depths, pred_depths, names, depth_masks=None):
         """
         Saves samples
         """
         rgbs = rgbs.cpu().numpy().transpose(0, 2, 3, 1)
         depth_preds = pred_depths.cpu().numpy()
-        gt_depths = gt_depths.cpu().numpy()
+
+        #print(rgbs)
+        #print(names)
+        
+        if gt_depths:
+            gt_depths = gt_depths.cpu().numpy()
+        
         if depth_masks is None:
             depth_masks = gt_depths != 0
         else:
@@ -70,30 +76,47 @@ class Saver(object):
 
         for i in range(rgbs.shape[0]):
             self.idx = self.idx+1
-            mkdirs(os.path.join(self.save_dir, '%04d'%(self.idx)))
+            #mkdirs(os.path.join(self.save_dir, '%04d'%(self.idx)))
 
-            cmap = plt.get_cmap("rainbow_r")
+            #print(os.path.basename(names[i]))
 
-            depth_pred = cmap(depth_preds[i][0].astype(np.float32)/10)
-            depth_pred = np.delete(depth_pred, 3, 2)
-            path = os.path.join(self.save_dir, '%04d' % (self.idx) ,'_depth_pred.jpg')
-            cv2.imwrite(path, (depth_pred * 255).astype(np.uint8))
+            path = os.path.join(self.save_dir, os.path.basename(names[i]).replace(".jpg", ".png"))
+            #print(path)
+            depth_pred = np.uint16(5000*depth_preds[i][0])
 
-            depth_gt = cmap(gt_depths[i][0].astype(np.float32)/10)
-            depth_gt = np.delete(depth_gt, 3, 2)
-            depth_gt[..., 0][~depth_masks[i][0]] = 0
-            depth_gt[..., 1][~depth_masks[i][0]] = 0
-            depth_gt[..., 2][~depth_masks[i][0]] = 0
-            path = os.path.join(self.save_dir, '%04d' % (self.idx), '_depth_gt.jpg')
-            cv2.imwrite(path, (depth_gt * 255).astype(np.uint8))
+            #dim = (1280, 720)
+            #resized = cv2.resize(depth_pred, dim)
 
-            path = os.path.join(self.save_dir, '%04d'%(self.idx) , '_pc_pred.ply')
-            self.save_as_point_cloud(depth_preds[i][0], rgbs[i], path)
+            #print(path)
 
-            path = os.path.join(self.save_dir, '%04d'%(self.idx) , '_pc_gt.ply')
-            self.save_as_point_cloud(gt_depths[i][0], rgbs[i], path, depth_masks[i][0])
+            cv2.imwrite(path, depth_pred)
 
-            rgb = (rgbs[i] * 255).astype(np.uint8)
-            path = os.path.join(self.save_dir, '%04d'%(self.idx) , '_rgb.jpg')
-            cv2.imwrite(path, rgb[:,:,::-1])
+            
+
+            # cmap = plt.get_cmap("rainbow_r")
+
+            # depth_pred = cmap(depth_preds[i][0].astype(np.float32)/10)
+            # depth_pred = np.delete(depth_pred, 3, 2)
+            # path = os.path.join(self.save_dir, '%04d' % (self.idx) ,'_depth_pred.jpg')
+            # cv2.imwrite(path, (depth_pred * 255).astype(np.uint8))
+
+            # #if gt_depths:
+            # #    depth_gt = cmap(gt_depths[i][0].astype(np.float32)/10)
+            # #    depth_gt = np.delete(depth_gt, 3, 2)
+            # #    depth_gt[..., 0][~depth_masks[i][0]] = 0
+            # #    depth_gt[..., 1][~depth_masks[i][0]] = 0
+            # #    depth_gt[..., 2][~depth_masks[i][0]] = 0
+            # #    path = os.path.join(self.save_dir, '%04d' % (self.idx), '_depth_gt.jpg')
+            # #    cv2.imwrite(path, (depth_gt * 255).astype(np.uint8))
+                
+            # #path = os.path.join(self.save_dir, '%04d'%(self.idx) , '_pc_pred.ply')
+            # #self.save_as_point_cloud(depth_preds[i][0], rgbs[i], path)
+
+            # #if gt_depths:
+            # #    path = os.path.join(self.save_dir, '%04d'%(self.idx) , '_pc_gt.ply')
+            # #    self.save_as_point_cloud(gt_depths[i][0], rgbs[i], path, depth_masks[i][0])
+
+            # rgb = (rgbs[i] * 255).astype(np.uint8)
+            # path = os.path.join(self.save_dir, '%04d'%(self.idx) , '_rgb.jpg')
+            # cv2.imwrite(path, rgb[:,:,::-1])
 
